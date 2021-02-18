@@ -24,7 +24,7 @@ debug   = True  # for testing - prints the form tags and field inputs
 # =========
 # FUNCTIONS
 # =========
-def parseForms(formUrl, label_wrapper = '', display = False):
+def parseForms(formUrl, labelWrapper = '', display = False):
     '''
         This function parses form data from the supplied url and returns all
         forms and their inputs on the page as a dictionary.
@@ -86,68 +86,68 @@ def parseForms(formUrl, label_wrapper = '', display = False):
                         action = form['action']
 
                     # get the label associated with the form inputs
-                    field_label = getLabel(form, label_wrapper)
+                    fieldLabel = getLabel(form, labelWrapper)
 
                     # print the form start tag
                     if display:
                         printFormStart(action, method)
 
                     # loop through each form input type
-                    for super_type in fieldInputs:
+                    for superType in fieldInputs:
                         # loop through each field input
-                        for field in tree.findAll(super_type):
+                        for field in tree.findAll(superType):
                             # create a dictionary object of field data
                             fieldData = {}
 
                             # get a name input attribute, if one exists
-                            field_name = getName(field)
+                            fieldName = getName(field)
 
                             # assign the input type (text, checkbox, radio, etc.)
                             # based on the given super type (input, select, textarea)
-                            field_type = getType(field, super_type)
+                            fieldType = getType(field, superType)
 
                             # check if the input is a standard input
-                            if super_type == 'input':
-                                field_value = ''
+                            if superType == 'input':
+                                fieldValue = ''
 
                                 # check if the input has a value attribute
                                 if any('value' in s for s in field.attrs):
-                                    field_value = field['value']
+                                    fieldValue = field['value']
 
                             # check if the input is a select
-                            elif super_type == 'select':
+                            elif superType == 'select':
                                 # create a new dictionary object to hold options
-                                field_value = {}
+                                fieldValue = {}
 
                                 # loop through the options
                                 for option in field.contents:
                                     try:
                                         # try to assign the value to the key
                                         # option.text is visible form text
-                                        field_value[option.text] = option['value']
+                                        fieldValue[option.text] = option['value']
                                     except KeyError, e:
                                         if option.text:
-                                            field_value[option.text] = option.text
+                                            fieldValue[option.text] = option.text
                                     except AttributeError, e:
                                         pass
                                     except TypeError, e:
                                         pass
 
                             # check if the input is a textarea
-                            elif super_type == 'textarea':
+                            elif superType == 'textarea':
                                 # assign the tag text
-                                field_value = field.text
+                                fieldValue = field.text
 
                             # assign the attribute data to the field
                             fieldData = {
-                                'label' : field_label,
-                                'name'  : field_name,
-                                'type'  : field_type,
-                                'value' : field_value}
+                                'label' : fieldLabel,
+                                'name'  : fieldName,
+                                'type'  : fieldType,
+                                'value' : fieldValue}
 
                             if display:
                                 # print the field input HTML (mainly for testing)
-                                printField(field_label, field_name, field_type, field_value)
+                                printField(fieldLabel, fieldName, fieldType, fieldValue)
 
                             # check if the data exists and append
                             if fieldData:
@@ -163,7 +163,7 @@ def parseForms(formUrl, label_wrapper = '', display = False):
     # return the forms
     return data
 
-def getLabel(form = '', label_wrapper = ''):
+def getLabel(form = '', labelWrapper = ''):
     '''
         Need to write this function.
         This function gets the label for a form input control.
@@ -171,21 +171,21 @@ def getLabel(form = '', label_wrapper = ''):
         It will search the obvious places first, like <label> and <td>,
         but will also check text surrounding the form input.
     '''
-    if label_wrapper == '':
-        label_wrapper = 'label'
+    if labelWrapper == '':
+        labelWrapper = 'label'
 
     labels = []
-    field_label = ''
+    fieldLabel = ''
 
     print '--- all labels ---'
-    for field_label in form.findAll(label_wrapper):
-        if field_label.text != '&nbsp;':
-            labels.append(field_label.text)
-            print field_label.text
+    for fieldLabel in form.findAll(labelWrapper):
+        if fieldLabel.text != '&nbsp;':
+            labels.append(fieldLabel.text)
+            print fieldLabel.text
 
 #    print labels
 
-    return field_label
+    return fieldLabel
 
 def getName(field):
     '''
@@ -194,29 +194,29 @@ def getName(field):
 
     # check if the field has a name attribute
     if any('name' in s for s in field.attrs):
-        field_name = field['name']
+        fieldName = field['name']
     else:
-        field_name = ''
+        fieldName = ''
 
-    return field_name
+    return fieldName
 
-def getType(field, super_type):
+def getType(field, superType):
     '''
         This function accepts a field input object and returns the type attribute.
     '''
 
     # check if type is not in field attributes
-    if super_type == 'input':
+    if superType == 'input':
         if field.find('type') != '':
-            field_type = field['type']
+            fieldType = field['type']
         else:
-            field_type = 'text'
-    elif super_type == 'select':
-        field_type = 'select'
+            fieldType = 'text'
+    elif superType == 'select':
+        fieldType = 'select'
     else:
-        field_type = 'textarea'
+        fieldType = 'textarea'
 
-    return field_type
+    return fieldType
 
 def printFormEnd():
     '''
@@ -225,17 +225,17 @@ def printFormEnd():
 
     print '</form>'
 
-def printField(field_label, field_name, field_type, field_value):
+def printField(fieldLabel, fieldName, fieldType, fieldValue):
     '''
         This is a general function for printing form inputs.
     '''
 
-    if field_type == 'select':
-        printSelect(field_label, field_name, field_value)
-    elif field_type == 'textarea':
-        printTextarea(field_label, field_name, field_value)
+    if fieldType == 'select':
+        printSelect(fieldLabel, fieldName, fieldValue)
+    elif fieldType == 'textarea':
+        printTextarea(fieldLabel, fieldName, fieldValue)
     else:
-        printInput(field_label, field_name, field_type, field_value)
+        printInput(fieldLabel, fieldName, fieldType, fieldValue)
 
 def printFormStart(action = '', method = 'post'):
     '''
@@ -245,17 +245,17 @@ def printFormStart(action = '', method = 'post'):
 
     print '<form action="'+action+'" method="'+method+'">'
 
-def printInput(field_label, field_name, field_type, field_value):
+def printInput(fieldLabel, fieldName, fieldType, fieldValue):
     '''
         This function accepts name, type, and value field input attributes
         and prints them in an HTML input tag.
     '''
 
-    if field_type == 'hidden':
-        print '<input name="'+field_name+'" type="'+field_type+'" value="'+field_value+'">'
+    if fieldType == 'hidden':
+        print '<input name="'+fieldName+'" type="'+fieldType+'" value="'+fieldValue+'">'
     else:
-        printLabelStart(field_label)
-        print '<input name="'+field_name+'" type="'+field_type+'" value="'+field_value+'">'
+        printLabelStart(fieldLabel)
+        print '<input name="'+fieldName+'" type="'+fieldType+'" value="'+fieldValue+'">'
         printLabelEnd()
 
 def printLabelEnd():
@@ -266,43 +266,43 @@ def printLabelEnd():
     print '</label>'
     print ''
 
-def printLabelStart(label_text = ''):
+def printLabelStart(labelText = ''):
     '''
         This function accepts an optional field input label and prints
         an HTML label tag.
     '''
 
-    print '<label>',label_text
+    print '<label>',labelText
 
-def printSelect(field_label, field_name, field_value):
+def printSelect(fieldLabel, fieldName, fieldValue):
     '''
         This function accepts name and options field input attributes and
         prints then in an HTML select tag.
     '''
 
-    printLabelStart(field_label)
-    print '<select name="'+field_name+'">'
+    printLabelStart(fieldLabel)
+    print '<select name="'+fieldName+'">'
 
-    for option in sorted(field_value.items()):
+    for option in sorted(fieldValue.items()):
         print '<option value="'+option[1]+'">'+option[0]+'</option>'
 
     print '</select>'
     printLabelEnd()
 
-def printTextarea(field_label, field_name, field_value):
+def printTextarea(fieldLabel, fieldName, fieldValue):
     '''
         This function accepts name and value field input attributes and
         prints them in an HTML textarea tag.
     '''
 
-    printLabelStart(field_label)
-    print '<textarea name="'+field_name+'">'+field_value+'</textarea>'
+    printLabelStart(fieldLabel)
+    print '<textarea name="'+fieldName+'">'+fieldValue+'</textarea>'
     printLabelEnd()
 
 # ============
 # MAIN PROGRAM
 # ============
-#formData = parseForms(url, label_wrapper, debug)
+#formData = parseForms(url, labelWrapper, debug)
 formData = parseForms(url, 'td')
 
-#print formData
+print formData
